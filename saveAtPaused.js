@@ -18,7 +18,7 @@ var mins; if(timemins != null) mins = parseInt(/^\d+(?=:)/.exec(timemins[0])[0])
 var secs; if(timemins != null) secs = parseInt(/\d+$/.exec(timemins[0])[0]);
 
 var startFrom = '?t='+((hour*(60*60))+(mins*60)+(secs));
-var vidId = '&id='+/\w+$/.exec(window.location.href)[0];
+var vidId = '&id='+/watch?v=/.exec(window.location.href)[0];
 
 var webAppUrl = "";
 var output = webAppUrl+startFrom+vidId;
