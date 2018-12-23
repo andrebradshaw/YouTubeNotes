@@ -1,3 +1,10 @@
+/* 
+build vids: 
+	intial test build:
+	https://youtu.be/T7rGTgriDdg
+	cleaning up:
+	https://youtu.be/Hf6kChpKZ9g 
+*/
 /* start utils functions */
 function convertTime2Secs(str) {
   var timehours = /^\d+:\d+:\d+$/.exec(str);
