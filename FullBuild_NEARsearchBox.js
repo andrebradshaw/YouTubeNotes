@@ -55,11 +55,6 @@ domObserver2.observe(document, {
 });
 /* end DOM observers */
 
-// var first = new Promise(res=>{res(clickMenu())});
-
-// first.then(clickTrans()).then(getTrans())
-
-
 function createSearchPop() {
 
   var transList = document.getElementById('transcript').getElementsByClassName('cue-group style-scope ytd-transcript-body-renderer');
