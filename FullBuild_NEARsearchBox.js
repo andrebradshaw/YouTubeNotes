@@ -43,7 +43,7 @@ domObserver1.observe(document, {
 
 var domObserver2 = new MutationObserver((mChanges, ob) => {
   if (document.getElementById('transcript') != null) {
-    createSearchPop()
+    createSearchPop();
     ob.disconnect();
     return;
   }
@@ -68,11 +68,11 @@ function createSearchPop() {
   for (i = 0; i < transList.length; i++) {
     var time = transList[i].getElementsByClassName('cue-group-start-offset style-scope ytd-transcript-body-renderer')[0].innerText;
     var txt = transList[i].getElementsByClassName('cues style-scope ytd-transcript-body-renderer')[0].innerText;
-    transArr.push([time, txt])
+    transArr.push([time, txt]);
   }
 
   var wordCount = transArr.map(itm => {
-    return itm[1].match(/\w+/g).length
+    return itm[1].match(/\w+/g).length;
   });
 
   var textBody = '';
@@ -148,7 +148,7 @@ function createSearchPop() {
       if(matches != null){
       	var timestamps = Array.from(matches).map(itm => {
 			var i1 = 'https://youtu.be/' + yt_id + '?t=' + convertTime2Secs(/\{(.+?)\}/.exec(itm)[1]);
-			var i2 = itm.replace(/\{.+?\}/g, '')
+			var i2 = itm.replace(/\{.+?\}/g, '');
         	return [i1,i2];
       	});
 
