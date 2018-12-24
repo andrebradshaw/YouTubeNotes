@@ -177,5 +177,10 @@ function createSearchPop() {
   }
   document.getElementById("btn_box").addEventListener("click", searchTrans);
   document.getElementById("btn_close").addEventListener("click", close);
-
+  document.getElementById("box_nearSearch").addEventListener('keydown', function(event) {
+		var k = event.key.toString();
+		if(k == "Enter"){
+			searchTrans();
+		} 
+	});
 }
