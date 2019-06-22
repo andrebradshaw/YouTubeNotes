@@ -6,37 +6,6 @@ var ele = (t) => document.createElement(t);
 var attr = (o, k, v) => o.setAttribute(k, v);
 var unq = (arr) => arr.filter((e, p, a) => a.indexOf(e) == p);
 
-function parseAsRegexArr(bool) {
-  function rxReady(s) {
-    return s ? s.replace(/"/g, '\\b').trim().replace(/\)/g, '').replace(/\(/g, '').replace(/\s+/g, '.{0,2}').replace(/\//g, '\\/').replace(/\+/g, '\\+').replace(/\s*\*\s*/g, '\\s*\\w*\\s+') : s;
-  }
-
-  function checkSimpleOR(s) {
-    return /\bor\b/i.test(s) && /\(/.test(s) === false;
-  }
-  if (checkSimpleOR(bool)) {
-    var x = new RegExp(bool.replace(/\s+OR\s+|\s*\|\s*/gi, '|').replace(/\//g, '\\/').replace(/"/g, '\\b').replace(/\s+/g, '.{0,2}').replace(/\s*\*\s*/g, '\\s*\\w*\\s+'), 'i');
-    var xArr = [x];
-    return xArr;
-  } else {
-    var orx = "\\(.+?\\)|(\\(\\w+\\s{0,1}OR\\s|\\w+\\s{0,1}OR\\s)+((\\w+\s)+?|(\\w+)\\)+)+?";
-    var orMatch = bool ? bool.match(new RegExp(orx, 'g')) : [];
-    var orArr = orMatch ? orMatch.map(function(b) {
-      return rxReady(b.replace(/\s+OR\s+|\s*\|\s*/gi, '|'))
-    }) : [];
-    var noOrs = bool ? bool.replace(new RegExp(orx, 'g'), '').split(/\s+[AND\s+]+/i) : bool;
-    var ands = noOrs ? noOrs.map(function(a) {
-      return rxReady(a)
-    }) : [];
-    var xArr = ands.concat(orArr).filter(function(i) {
-      return i != ''
-    }).map(function(x) {
-      return new RegExp(x, 'i')
-    });
-    return xArr;
-  }
-}
-
 async function getTranscripts(href, doc) {
   var shareEntity = reg(/(?<=serializedShareEntity":").+?(?=%)/.exec(doc.body.outerHTML), 0);
   var trackingParams = reg(/(?<="clickTrackingParams":").+?(?=")/.exec(doc.body.outerHTML), 0);
@@ -83,11 +52,12 @@ async function getVideoTrans(path) {
 async function createHTMLSearchBox(path) {
   var transcripts = await getVideoTrans(path);
   var mapped = '';
-  transcripts.forEach(el => {
-    mapped = mapped + el[0] + ' t_' + Math.round(el[2] / 1000) + ' '
-  });
-  console.log(mapped);
-
+  if(transcripts){
+    transcripts.forEach(el => {
+      mapped = mapped + el[0] + ' t_' + Math.round(el[2] / 1000) + ' '
+    });
+    console.log(mapped);
+  }
 
   if (gi(document, 'trans_search_container')) gi(document, 'trans_search_container').outerHTML = '';
 
@@ -104,7 +74,7 @@ async function createHTMLSearchBox(path) {
   var close = ele('div');
   attr(close, 'id', 'trans_search_close');
   attr(close, 'style', 'padding: 6px; background: transparent; color: crimson; float: left; transform: scale(3.3, 2); cursor: pointer;');
-  close.innerText = 'X'
+  close.innerText = 'X';
   head.appendChild(close);
 
   var bod = ele('div');
@@ -114,9 +84,10 @@ async function createHTMLSearchBox(path) {
 
   var searchBox = ele('input');
   attr(searchBox, 'id', 'trans_search_searchBox');
-  attr(searchBox, 'placeholder', 'Transcript Search');
-  attr(searchBox, 'style', 'padding: 6px; background: #fff; color: #004471; border-radius: 0.2em; border: 1px solid #004471; width: 92%');
+  attr(searchBox, 'placeholder', 'Transcript Search - Enter to run');
+  attr(searchBox, 'style', 'padding: 6px; background: #fff; color: #004471; border-radius: 0.2em; border: 1px solid #004471; width: 94%;');
   bod.appendChild(searchBox);
+
   searchBox.addEventListener('keydown', (e) => {
     if (/Enter/i.test(e.key.toString())) {
       runSearch();
@@ -136,24 +107,28 @@ async function createHTMLSearchBox(path) {
         var moveback = second && second > 2 ? second - 3 : null;
         var linkgen = moveback ? 'https://youtu.be/' + path + '?t=' + moveback : '';
         matchingLinks.push([el.replace(/\s*t_\d+\s*/g, ''), linkgen]);
-
       });
     }
-    console.log(matchingLinks);
 
     var resCont = ele('div');
     attr(resCont, 'id', 'search_resContainer');
     attr(resCont, 'style', 'padding: 6px;');
     bod.appendChild(resCont);
-    if (matchingLinks) {
+    if (matches) {
       matchingLinks.forEach(el => {
         var link = ele('div');
         attr(link, 'style', 'padding: 6px;');
         resCont.appendChild(link);
         link.innerHTML = '<a href="' + el[1] + '">' + el[0] + '</a>';
       });
+    }else{
+      var link = ele('div');
+      attr(link, 'style', 'padding: 6px;');
+      resCont.appendChild(link);
+      link.innerText = 'no results';
     }
   }
 
 }
-createHTMLSearchBox('Irg_Ux41drc')
+var tubePath = reg(/(?<=youtube.com\/watch\?v=|youtu.be\/).+?(?=\&|\?|$)/.exec(window.location.href),0);
+if(tubePath) createHTMLSearchBox(tubePath);
