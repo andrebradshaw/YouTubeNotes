@@ -7,40 +7,40 @@ var attr = (o, k, v) => o.setAttribute(k, v);
 var unq = (arr) => arr.filter((e, p, a) => a.indexOf(e) == p);
 
 function dragElement() {
-  var elmnt = this.parentElement;
-  var pos1 = 0,
-    pos2 = 0,
-    pos3 = 0,
-    pos4 = 0;
-  if (document.getElementById(this.id)) {
-    document.getElementById(this.id).onmousedown = dragMouseDown;
-  } else {
-    this.onmousedown = dragMouseDown;
-  }
+var elmnt = this.parentElement;
+var pos1 = 0,
+  pos2 = 0,
+  pos3 = 0,
+  pos4 = 0;
+if (document.getElementById(this.id)) {
+  document.getElementById(this.id).onmousedown = dragMouseDown;
+} else {
+  this.onmousedown = dragMouseDown;
+}
 
-  function dragMouseDown(e) {
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    document.onmousemove = elementDrag;
-  }
+function dragMouseDown(e) {
+  pos3 = e.clientX;
+  pos4 = e.clientY;
+  document.onmouseup = closeDragElement;
+  document.onmousemove = elementDrag;
+}
 
-  function elementDrag(e) {
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    elmnt.style.opacity = "0.85";
-    elmnt.style.transition = "opacity 700ms";
-  }
+function elementDrag(e) {
+  pos1 = pos3 - e.clientX;
+  pos2 = pos4 - e.clientY;
+  pos3 = e.clientX;
+  pos4 = e.clientY;
+  elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+  elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  elmnt.style.opacity = "0.85";
+  elmnt.style.transition = "opacity 700ms";
+}
 
-  function closeDragElement() {
-    document.onmouseup = null;
-    document.onmousemove = null;
-    elmnt.style.opacity = "1";
-  }
+function closeDragElement() {
+  document.onmouseup = null;
+  document.onmousemove = null;
+  elmnt.style.opacity = "1";
+}
 }
 
 async function getTranscripts(href, doc) {
@@ -89,7 +89,7 @@ async function getVideoTrans(path) {
 async function createHTMLSearchBox(path) {
   var transcripts = await getVideoTrans(path);
   var mapped = '';
-  if (transcripts) {
+  if(transcripts){
     transcripts.forEach(el => {
       mapped = mapped + el[0] + ' t_' + Math.round(el[2] / 1000) + ' '
     });
@@ -107,39 +107,38 @@ async function createHTMLSearchBox(path) {
   attr(head, 'id', 'trans_search_head');
   attr(head, 'style', 'padding: 6px; background: #004471; color: #fff; border-radius: 0.2em; border: 1.5px solid #004471; height: 14px; cursor: move;');
   cont.appendChild(head);
-  head.addEventListener('mouseover', dragElement);
+  head.addEventListener('mouseover',dragElement);
 
   var close = ele('div');
   attr(close, 'id', 'trans_search_close');
   attr(close, 'style', 'padding: 1px; background: transparent; color: crimson; float: left; transform: scale(3, 1.8); cursor: pointer;');
   close.innerText = 'X';
   head.appendChild(close);
-  close.addEventListener('click', kill2xParents);
+  close.addEventListener('click',kill2xParents);
 
   var bod = ele('div');
   attr(bod, 'id', 'trans_search_body');
   attr(bod, 'style', 'padding: 6px; background: #fff; color: #000; border-radius: 0.2em; border: 1.5px solid #004471;');
   cont.appendChild(bod);
 
-  if (transcripts) {
-    var searchBox = ele('input');
-    attr(searchBox, 'id', 'trans_search_searchBox');
-    attr(searchBox, 'placeholder', 'Transcript Search - Press Enter to run');
-    attr(searchBox, 'style', 'padding: 6px; background: #fff; color: #004471; border-radius: 0.2em; border: 1px solid #004471; width: 94%;');
-    bod.appendChild(searchBox);
+if(transcripts){
+  var searchBox = ele('input');
+  attr(searchBox, 'id', 'trans_search_searchBox');
+  attr(searchBox, 'placeholder', 'Transcript Search - Press Enter to run');
+  attr(searchBox, 'style', 'padding: 6px; background: #fff; color: #004471; border-radius: 0.2em; border: 1px solid #004471; width: 94%;');
+  bod.appendChild(searchBox);
 
-    searchBox.addEventListener('keydown', (e) => {
-      if (/Enter/i.test(e.key.toString())) {
-        runSearch();
-      }
-    });
-  } else {
-    var searchBox = ele('div');
-    attr(searchBox, 'style', 'padding: 6px; background: #fff; color: #004471; border-radius: 0.2em; border: 1px solid #004471; width: 94%;');
-    bod.appendChild(searchBox);
-    searchBox.innerText = 'This video doesnt have transcripts ¯\_(ツ)_/¯';
-  }
-
+  searchBox.addEventListener('keydown', (e) => {
+    if (/Enter/i.test(e.key.toString())) {
+      runSearch();
+    }
+  });
+}else{
+  var searchBox = ele('div');
+  attr(searchBox, 'style', 'padding: 6px; background: #fff; color: #004471; border-radius: 0.2em; border: 1px solid #004471; width: 94%;');
+  bod.appendChild(searchBox);
+  searchBox.innerText = 'This video doesnt have transcripts ¯\\_(ツ)_/¯';
+}
   function runSearch() {
     if (gi(document, 'search_resContainer')) gi(document, 'search_resContainer').outerHTML = '';
     var matchingLinks = [];
@@ -167,7 +166,7 @@ async function createHTMLSearchBox(path) {
         resCont.appendChild(link);
         link.innerHTML = '<a href="' + el[1] + '">' + el[0] + '</a>';
       });
-    } else {
+    }else{
       var link = ele('div');
       attr(link, 'style', 'padding: 6px;');
       resCont.appendChild(link);
@@ -177,9 +176,9 @@ async function createHTMLSearchBox(path) {
 
 }
 
-function kill2xParents() {
+function kill2xParents(){
   this.parentElement.parentElement.outerHTML = '';
 }
 
-var tubePath = reg(/(?<=youtube.com\/watch\?v=|youtu.be\/).+?(?=\&|\?|$)/.exec(window.location.href), 0);
-if (tubePath) createHTMLSearchBox(tubePath);
+var tubePath = reg(/(?<=youtube.com\/watch\?v=|youtu.be\/).+?(?=\&|\?|$)/.exec(window.location.href),0);
+if(tubePath) createHTMLSearchBox(tubePath);
