@@ -8,6 +8,15 @@ var unq = (arr) => arr.filter((e, p, a) => a.indexOf(e) == p);
 
 var delay = (ms) => new Promise(res => setTimeout(res, ms));
 var rando = (n) => Math.round(Math.random() * n);
+var videoTranscriptsContainer = [];
+var videoPathsContainer = [];
+
+function addVideos2Container(){
+  var vlinks = unq(Array.from(tn(document,'a')).filter(el=> { return /watch\?/.test(el.href); }).map(el=> reg(/(?<=watch\?v=|youtu.be\/).+?(?=\&|\?|$)/.exec(el.href),0)));
+  vlinks.forEach(link=> {
+    if(videoPathsContainer.every(itm=> itm != link)) videoPathsContainer.push(link);
+  });
+}
 
 function dragElement() {
 var elmnt = this.parentElement;
@@ -90,21 +99,18 @@ async function getVideoTrans(path) {
 }
 
 async function loopThroughVideoLinks(){
-  var temp = [];
-  var videoLinks = unq(Array.from(tn(document,'a')).filter(el=> { return /watch\?/.test(el.href); }).map(el=> reg(/(?<=watch\?v=|youtu.be\/).+?(?=\&|\?|$)/.exec(el.href),0)));
-  for(var i=0; i<videoLinks.length; i++){
-    gi(document,'trans_search_loading').innerHTML = 'Hang on for a bit<br>Downloading transcripts from '+(videoLinks.length+1)+' videos. '+Math.round((i/videoLinks.length)*100)+'% complete.';
-    var trans = await getVideoTrans(videoLinks[i]);
+  await addVideos2Container();
+  for(var i=videoTranscriptsContainer.length; i<videoPathsContainer.length; i++){
+    gi(document,'trans_search_loading').innerHTML = 'Downloading transcripts from '+(videoPathsContainer.length+1)+' videos. '+Math.round((i/videoPathsContainer.length)*100)+'% complete.<br>You can start searching, but the results will only run on the portion of the completed download.';
+    var trans = await getVideoTrans(videoPathsContainer[i]);
     if(trans){
       var transcript = mapTranscripts(trans);
-      var obj = {path: videoLinks[i], transcript: transcript};
-      temp.push(obj);
+      var obj = {path: videoPathsContainer[i], transcript: transcript};
+      videoTranscriptsContainer.push(obj);
     }
     await delay(rando(20)+222);
-    console.log(videoLinks[i]);
   }
   gi(document,'trans_search_loading').outerHTML = '';
-  return temp;
 }
 
 function mapTranscripts(arr){
@@ -151,7 +157,8 @@ async function createHTMLSearchBox() {
   bod.appendChild(loading);
   loading.innerText = 'Downloading transcripts from '+(videoLinks.length+1)+' videos';
 
-  var transcripts = await loopThroughVideoLinks();
+//   var transcripts = await loopThroughVideoLinks();
+  loopThroughVideoLinks();
 
   var searchBox = ele('input');
   attr(searchBox, 'id', 'trans_search_searchBox');
@@ -171,7 +178,7 @@ async function createHTMLSearchBox() {
     var bool = gi(document, 'trans_search_searchBox').value.replace(/\s*\*\s*/g, '\\s*\\w*\\s+');
     var x = bool ? new RegExp(bool + '.+?(t_\\d+)', 'i') : null;
 
-    var matches = transcripts.map(el=> {return {path: el.path, transcript: el.transcript.match(new RegExp(bool + '.+?(t_\\d+)', 'ig'))} });
+    var matches = videoTranscriptsContainer.map(el=> {return {path: el.path, transcript: el.transcript.match(new RegExp(bool + '.+?(t_\\d+)', 'ig'))} });
 	console.log(matches);
     if (matches) {
       matches.forEach(el => {
@@ -191,6 +198,11 @@ async function createHTMLSearchBox() {
     attr(resCont, 'id', 'search_resContainer');
     attr(resCont, 'style', 'padding: 6px; max-height: 400px; overflow-y: scroll; overflow-x: hidden;');
     bod.appendChild(resCont);
+
+    var numSearched = ele('div');
+    attr(numSearched, 'style', '');
+    numSearched.innerText = 'Search results from '+(matches.length+1)+' videos.';
+    resCont.appendChild(numSearched);
 
     if (matches) {
       matchingLinks.forEach(el => {
