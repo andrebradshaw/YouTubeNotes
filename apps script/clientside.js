@@ -172,7 +172,7 @@ function searchNotes() {
 async function getTimestamp() {
   var sharebtn = Array.from(cn(document, 'style-scope ytd-button-renderer style-default size-default')).filter(el => /Share/i.test(el.innerText));
   sharebtn[0].click();
-  await delay(633);
+  await delay(1033);
   var time = gi(document, 'start-at-timestamp').value.trim();
   var timestamp = convertTime2Secs(time);
   await delay(333);
