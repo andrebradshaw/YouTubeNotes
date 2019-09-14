@@ -41,4 +41,9 @@ async function createNotesHTML(){
   console.log(linkOutput);
 }
 
-createNotesHTML()
+createNotesHTML();
+
+var search_input = prompt('enter your search');
+var search_notes = `https://script.google.com/macros/s/AKfycbwHbKfS4H8wh5i_zihRgq0QtfMmk5zQ7IHBq8ND6xc/dev?search=${encodeURIComponent(search_input)}`;
+window.open(search_notes);
+
