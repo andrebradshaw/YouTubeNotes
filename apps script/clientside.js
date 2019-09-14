@@ -8,6 +8,8 @@ var delay = (ms) => new Promise(res => setTimeout(res, ms));
 var ele = (t) => document.createElement(t);
 var attr = (o, k, v) => o.setAttribute(k, v);
 
+var appsScriptWebAppLink = 'https://script.google.com/macros/s/AKfycbx6XDqCQ9-YIfIL6sQm36hjOIKugbkLgTFqZQtVkdja6aSHlZQ/exec';
+
 function aninCloseBtn() {
   var l1 = tn(this, 'path')[0];
   var l2 = tn(this, 'path')[1];
@@ -64,47 +66,17 @@ function dragElement() {
   }
 }
 
-function convertTime2Secs(str){
-	var timehours = /^\d+:\d+:\d+$/.exec(str);
-	var timemins = /^\d+:\d+$/.exec(str);
-	var hour = timehours ? parseInt(/^\d+(?=:)/.exec(timehours[0])[0]) : 0;
-	var mins = timemins ? parseInt(/^\d+(?=:)/.exec(timemins[0])[0]) : 0;
-	var secs = timemins ? parseInt(/\d+$/.exec(timemins[0])[0]) : 0;
-	return ((hour*(60*60))+(mins*60)+(secs));
+function convertTime2Secs(str) {
+  var timehours = /^\d+:\d+:\d+$/.exec(str);
+  var timemins = /^\d+:\d+$/.exec(str);
+  var hour = timehours ? parseInt(/^\d+(?=:)/.exec(timehours[0])[0]) : 0;
+  var mins = timemins ? parseInt(/^\d+(?=:)/.exec(timemins[0])[0]) : 0;
+  var secs = timemins ? parseInt(/\d+$/.exec(timemins[0])[0]) : 0;
+  return ((hour * (60 * 60)) + (mins * 60) + (secs));
 }
 
-
-async function getTimestamp(){
-  var sharebtn = Array.from(cn(document,'style-scope ytd-button-renderer style-default size-default')).filter(el=> /Share/i.test(el.innerText));
-  sharebtn[0].click();
-  await delay(633);
-  var time = gi(document,'start-at-timestamp').value;
-  var timestamp = convertTime2Secs(time);
-  await delay(333);
-  var closer = Array.from(tn(document,'yt-icon')).filter(el=> el.getAttribute('icon') == 'close');
-  if(closer && closer[0]) closer[0].click();
-  return timestamp;
-}
-
-async function createNotesHTML(){
-  var timestamp = await getTimestamp();
-  var videoId = reg(/(?<=youtube\.com\/watch\?v=|youtu\.be\/).+?(?=\?|$)/.exec(window.location.href),0);
-  var linkOutput = encodeURIComponent(`https://youtu.be/${videoId}?t=${timestamp}`);
-  var notes = prompt('add notes here');
-  var send_to_sheets = `https://script.google.com/macros/s/AKfycbx6XDqCQ9-YIfIL6sQm36hjOIKugbkLgTFqZQtVkdja6aSHlZQ/exec?link=${linkOutput}&notes=${notes}`;
-  window.open(send_to_sheets);
-  console.log(linkOutput);
-}
-
-// createNotesHTML();
-
-// var search_input = prompt('enter your search');
-// var search_notes = `https://script.google.com/macros/s/AKfycbwHbKfS4H8wh5i_zihRgq0QtfMmk5zQ7IHBq8ND6xc/dev?search=${encodeURIComponent(search_input)}`;
-// window.open(search_notes);
-
-
-function createYTnotesHTML(){
-  if(gi(document,'youtube_note_search_container')) gi(document,'youtube_note_search_container').outerHTML = '';
+function createYTnotesHTML() {
+  if (gi(document, 'youtube_note_search_container')) gi(document, 'youtube_note_search_container').outerHTML = '';
 
   var cont = ele('div');
   attr(cont, 'id', 'youtube_note_search_container');
@@ -112,7 +84,7 @@ function createYTnotesHTML(){
   document.body.appendChild(cont);
 
   var head = ele('div');
-  attr(head,'style',`display: grid; grid-template-columns: 91% 9%; background: #060338; border: 1.3px solid #04021f; border-top-left-radius: 0.3em; border-top-right-radius: 0.3em; cursor: move; padding: 6px;`);
+  attr(head, 'style', `display: grid; grid-template-columns: 91% 9%; background: #063842; border: 1.3px solid #021c21; border-top-left-radius: 0.3em; border-top-right-radius: 0.3em; cursor: move; padding: 6px;`);
   cont.appendChild(head);
   head.onmouseover = dragElement;
 
@@ -120,7 +92,7 @@ function createYTnotesHTML(){
   attr(htxt, 'style', `grid-area: 1 / 1; color: #fff;`)
   head.appendChild(htxt);
   htxt.innerText = 'YouTube Notes';
-  
+
   var cls = ele('div');
   attr(cls, 'style', `grid-area: 1 / 2; width: 30px; height: 30px; cursor: pointer;`);
 
@@ -131,22 +103,91 @@ function createYTnotesHTML(){
   cls.onclick = closeView;
 
   var cbod = ele('div');
-  attr(cbod,'style',`display: grid; grid-template-rows; grid-gap: 10px; border: 1.3px solid #04021f; border-bottom-left-radius: 0.3em; border-bottom-right-radius: 0.3em; background: #9c9c9c; padding: 12px;`);
+  attr(cbod, 'style', `display: grid; grid-template-rows; grid-gap: 10px; border: 1.3px solid #021c21; border-bottom-left-radius: 0.3em; border-bottom-right-radius: 0.3em; background: #9c9c9c; padding: 12px;`);
   cont.appendChild(cbod);
-  
+
+  var c1 = ele('div');
+  attr(c1, 'style', `display: grid; grid-template-columns: 89% 9%; grid-gap: 2%;`);
+  cbod.appendChild(c1);
+
+  var c2 = ele('div');
+  attr(c2, 'style', `display: grid; grid-template-columns: 89% 9%; grid-gap: 2%;`);
+  cbod.appendChild(c2);
+
   var setnote = ele('input');
-  attr(setnote,'id','save_note_val');
-  attr(setnote,'placeholder','Save note');
-  attr(setnote,'style',`width: 100%; border: 1px solid transparent; border-radius: 0.3em; padding: 2px;`);
-  cbod.appendChild(setnote);
+  attr(setnote, 'id', 'save_note_val');
+  attr(setnote, 'placeholder', 'Save note');
+  attr(setnote, 'style', `grid-area: 1 / 1; border: 1px solid transparent; border-radius: 0.3em; padding: 2px;`);
+  c1.appendChild(setnote);
+  setnote.onkeyup = enterSearch;
+
+  var setbtn = ele('div');
+  attr(setbtn, 'style', `grid-area: 1 / 2; border: 1px solid #063842; border-radius: 0.3em; padding: 2px; cursor: pointer; color: #fff; background: #063842; text-align: center; font-size: 1.5em;`);
+  setbtn.innerText = '>';
+  c1.appendChild(setbtn);
+  setbtn.onclick = createNotesHTML;
+  setbtn.onmouseenter = btnhoverin;
+  setbtn.onmouseleave = btnhoverout;
 
   var searchnote = ele('input');
-  attr(searchnote,'id','search_note_val');
-  attr(searchnote,'placeholder','Search notes');
-  attr(searchnote,'style',`width: 100%; border: 1px solid transparent; border-radius: 0.3em; padding: 2px;`);
-  cbod.appendChild(searchnote);
+  attr(searchnote, 'id', 'search_note_val');
+  attr(searchnote, 'placeholder', 'Search notes');
+  attr(searchnote, 'style', `grid-area: 1 / 1; border: 1px solid transparent; border-radius: 0.3em; padding: 2px;`);
+  c2.appendChild(searchnote);
+  searchnote.onkeyup = enterSearch;
 
-//   var 
+  var searchbtn = ele('div');
+  attr(searchbtn, 'style', `grid-area: 1 / 2; border: 1px solid #063842; border-radius: 0.3em; padding: 2px; cursor: pointer; color: #fff; background: #063842; text-align: center; font-size: 1.5em;`);
+  searchbtn.innerText = '>';
+  c2.appendChild(searchbtn);
+  searchbtn.onclick = searchNotes;
+  searchbtn.onmouseenter = btnhoverin;
+  searchbtn.onmouseleave = btnhoverout;
 
 }
+
+function btnhoverin() {
+  this.style.background = '#043d47';
+  this.style.transition = 'all 111ms';
+}
+
+function btnhoverout() {
+  this.style.background = '#063842';
+  this.style.transition = 'all 111ms';
+}
+
+function enterSearch(e) {
+  if (e.key == 'Enter') {
+    if (this.getAttribute('id') == 'search_note_val') searchNotes();
+    if (this.getAttribute('id') == 'save_note_val') createNotesHTML();
+  }
+}
+
+function searchNotes() {
+  var search_input = gi(document, 'search_note_val').value;
+  var search_notes = `${appsScriptWebAppLink}?search=${encodeURIComponent(search_input)}`;
+  if (search_input) window.open(search_notes);
+}
+
+async function getTimestamp() {
+  var sharebtn = Array.from(cn(document, 'style-scope ytd-button-renderer style-default size-default')).filter(el => /Share/i.test(el.innerText));
+  sharebtn[0].click();
+  await delay(633);
+  var time = gi(document, 'start-at-timestamp').value.trim();
+  var timestamp = convertTime2Secs(time);
+  await delay(333);
+  var closer = Array.from(tn(document, 'yt-icon')).filter(el => el.getAttribute('icon') == 'close');
+  if (closer && closer[0]) closer[0].click();
+  return timestamp;
+}
+
+async function createNotesHTML() {
+  var timestamp = await getTimestamp();
+  var videoId = reg(/(?<=youtube\.com\/watch\?v=|youtu\.be\/).+?(?=\?|$)/.exec(window.location.href), 0);
+  var linkOutput = encodeURIComponent(`https://youtu.be/${videoId}?t=${timestamp}`);
+  var notes = gi(document, 'save_note_val').value.trim();
+  var send_to_sheets = `${appsScriptWebAppLink}?link=${linkOutput}&notes=${notes}`;
+  if (notes) window.open(send_to_sheets);
+}
+
 createYTnotesHTML()
