@@ -35,10 +35,10 @@ async function createNotesHTML(){
   var timestamp = await getTimestamp();
   var videoId = reg(/(?<=youtube\.com\/watch\?v=|youtu\.be\/).+?(?=\?|$)/.exec(window.location.href),0);
   var linkOutput = encodeURIComponent(`https://youtu.be/${videoId}?t=${timestamp}`);
-
+  var notes = prompt('add notes here');
+  var send_to_sheets = `https://script.google.com/macros/s/AKfycbx6XDqCQ9-YIfIL6sQm36hjOIKugbkLgTFqZQtVkdja6aSHlZQ/exec?link=${linkOutput}&notes=${notes}`;
+  window.open(send_to_sheets);
   console.log(linkOutput);
-
-
 }
 
 createNotesHTML()
